@@ -8,12 +8,38 @@ variable "prefix" {
   default = "oozou-server"
 }
 
+resource "aws_security_group" "oozou-server-sg" {
+  name        = "oozou-sg"
+  description = "Allow incoming traffic to the Linux EC2 Instance"
+  vpc_id      = "vpc-1320075"
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow incoming grafana connections"
+  }
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow incoming SSH connections"
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_instance" "oozou-server" {
   ami           = "ami-007a18d38016a0f4e"
   instance_type = "t3.small"
   count = 1
   vpc_security_group_ids = [
-    "sg-0d8bdc71aee9f"
+    "aws_security_group.oozou-server-sg"
   ]
   user_data = <<EOF
 #!/bin/bash
