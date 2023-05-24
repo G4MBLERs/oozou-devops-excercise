@@ -1,0 +1,21 @@
+version: '3'
+services:
+  app:
+    build: .
+    environment:
+      NODE_ENV: development
+      STATSD_HOST: statsd
+    container_name: oozou-devops-app
+    depends_on: 
+       - statsd 
+  statsd:
+     image: graphiteapp/graphite-statsd
+     container_name: statsd
+     ports:
+       - "8080:80"
+       - "8125:8125"
+  grafana:
+      image: grafana/grafana
+      container_name: grafana
+      ports:
+        - "3000:3000"
