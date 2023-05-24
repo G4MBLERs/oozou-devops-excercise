@@ -5,7 +5,8 @@ services:
     environment:
       NODE_ENV: development
       STATSD_HOST: statsd
-    container_name: oozou-devops-app
+    deploy:
+      replicas: 2
     depends_on: 
        - statsd 
   statsd:
