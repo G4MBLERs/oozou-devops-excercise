@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: graphite-statsd-deployment
+    namespace: dev-oozou
+spec:
+  replicas : 2
+  selector:
+      matchLabels:
+        app: graphite-statsd
+  template:
+      metadata:
+        name: graphite-statsd-pods
+        labels:
+            app: graphite-statsd
+      spec:
+          containers:
+              - name : graphite-statsd
+                image: graphiteapp/graphite-statsd
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - containerPort: 8125
+                    name: http-statsd
+                    protocol: TCP
+                  - containerPort: 80
+                    name: http-graphite
+                    protocol: TCP
+                readinessProbe:
+                    failureThreshold: 3
+                    httpGet:
+                      path: /
+                      port: 80
+                      scheme: HTTP
+                    initialDelaySeconds: 10
+                    periodSeconds: 30
+                    successThreshold: 1
+                    timeoutSeconds: 2
+                livenessProbe:
+                    failureThreshold: 3
+                    initialDelaySeconds: 30
+                    periodSeconds: 10
+                    successThreshold: 1
+                    timeoutSeconds: 1
+                resources:
+                    requests:
+                      cpu: 250m
+                      memory: 750Mi                
+          volumes:
+            - name: graphite-data
+              persistentVolumeClaim:
+                claimName: graphite-pvc
+---
+apiVersion: v1
+kind : Service
+metadata:
+    name: graphite-statsd-service
+spec:
+    type: ClusterIP
+    selector:
+      app: graphite-statsd
+    ports:
+      - port: 8125
+        targetPort: http-statsd
+      - port: 8080
+        targetPort: http-graphite

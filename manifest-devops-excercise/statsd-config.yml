@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: statsd-config
+  namespace: dev-oozou
+data:
+  statsd-url: dev-oozou.graphite-service.svc:8125
