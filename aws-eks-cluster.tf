@@ -8,6 +8,8 @@ resource "aws_eks_cluster" "cluster" {
   }
 }
 
+# Security : define security group policy in eks cluster to allow only grafana ports
+# High Availability : Using autoscaling and Available Zone in subnet networking.
 
 resource "aws_security_group" "eks-sg" {
   name        = "eks-sg"
