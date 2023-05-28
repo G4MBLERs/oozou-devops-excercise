@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: oozou-app-deployment
+    namespace: dev-oozou
+spec:
+  replicas : 2
+  selector:
+      matchLabels:
+        app: oozou-app
+  template:
+      metadata:
+        name: oozou-app-pods
+        labels:
+            app: oozou-app
+      spec:
+          containers:
+              - name : oozou-app
+                image: lvlal2iko/oozou-app:latest
+                imagePullPolicy: IfNotPresent
+                env:
+                - name: NODE_ENV
+                  value : "development"
+                - name: STATSD_HOST
+                  valueFrom:
+                    configMapKeyRef:
+                      name: statsd-config
+                      key: statsd-url
+                resources:
+                  requests:
+                    cpu: 100m
+                    memory: 128Mi
